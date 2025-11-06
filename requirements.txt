@@ -1,7 +1,30 @@
+# Core
 streamlit
-easyocr
-opencv-python
-pillow
+pandas
 numpy
-transformers
+pillow
+opencv-python
+
+# OCR & NLP
+easyocr
 torch
+transformers
+huggingface_hub
+
+# Data Visualization & Dashboarding
+plotly
+matplotlib
+seaborn
+
+# Email, Automation & Integration
+smtplib
+requests
+
+# Utilities
+python-dotenv
+scikit-learn
+tqdm
+
+# Optional (for better OCR accuracy / image handling)
+pdf2image
+pytesseract
