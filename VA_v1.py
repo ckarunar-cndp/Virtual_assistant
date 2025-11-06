@@ -74,7 +74,7 @@ st.markdown(
 # ==========================================================
 # 🌟 Header with Logo + Title + Subtitle
 # ==========================================================
-logo_path = Path("ML Logo.png")
+logo_path = Path("ML Logo 1.png")
 
 def render_header():
     logo_html = ""
