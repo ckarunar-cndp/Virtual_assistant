@@ -17,3 +17,5 @@ llama-index-embeddings-huggingface
 accelerate
 torch
 docx2txt
+cv2
+easyocr
