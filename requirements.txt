@@ -16,4 +16,4 @@ llama-index-llms-huggingface
 llama-index-embeddings-huggingface
 accelerate
 torch
-
+docx2txt
