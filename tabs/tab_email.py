@@ -89,7 +89,7 @@ def show_email_tab():
             st.warning("⚠️ Please fill in all required fields.")
             return
 
-        with st.spinner("💌 Crafting your email..."):
+        with st.spinner("📧 Crafting your email..."):
             email_output = draft_email_with_ai(subject, recipient, tone, details, email_type, length)
 
         st.success("✅ Email draft generated!")
@@ -98,3 +98,4 @@ def show_email_tab():
 
         with st.expander("📋 Copy Email"):
             st.code(email_output, language="markdown")
+
