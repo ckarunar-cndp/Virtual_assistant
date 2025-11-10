@@ -1,36 +1,94 @@
 import streamlit as st
-import os
+import docx2txt
+from PyPDF2 import PdfReader
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client
+client = OpenAI()
 
-def generate_summary(text, tone):
-    """Summarize text with a given tone."""
+# --- Helper: extract text from uploaded files ---
+def extract_uploaded_text(uploaded_file):
+    """Extract text from .txt, .pdf, or .docx files."""
+    text = ""
+    if uploaded_file.name.endswith(".txt"):
+        text = uploaded_file.read().decode("utf-8")
+    elif uploaded_file.name.endswith(".pdf"):
+        pdf = PdfReader(uploaded_file)
+        text = "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
+    elif uploaded_file.name.endswith(".docx"):
+        text = docx2txt.process(uploaded_file)
+    return text.strip()
+
+
+# --- OpenAI-powered summarization ---
+def openai_summarize_text(text, length_option):
+    """Use OpenAI model to summarize text based on the chosen length."""
+    length_prompt = {
+        "Very short (1–2 lines)": "Summarize this text in 1–2 concise lines.",
+        "Short (3–5 lines)": "Summarize this text in 3–5 bullet points.",
+        "Detailed paragraph": "Summarize this text in a detailed paragraph."
+    }
+
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": f"You are a summarization assistant. Produce a {tone.lower()} summary."},
-                {"role": "user", "content": text}
+                {"role": "system", "content": "You are a professional text summarizer."},
+                {"role": "user", "content": f"{length_prompt[length_option]}\n\nText:\n{text}"}
             ],
             temperature=0.5,
         )
-        return response.choices[0].message.content.strip()
+        summary = response.choices[0].message.content.strip()
+        return summary
     except Exception as e:
-        return f"⚠️ Error: {e}"
+        return f"⚠️ Error during summarization: {e}"
 
+
+# --- Download helper ---
+def get_text_download_link(text, filename):
+    """Generate a Streamlit download button for text content."""
+    st.download_button("📥 Download Summary", text, file_name=filename)
+
+
+# --- Streamlit UI ---
 def show_summary_tab():
-    st.subheader("🧾 Text Summarizer")
-    st.markdown("Summarize long text, articles, or reports with an AI-powered assistant.")
+    st.subheader("📄 Document Summarization (AI-Powered)")
+    st.markdown("Upload a document or paste text to generate a concise summary using OpenAI API.")
 
-    text = st.text_area("📄 Paste your text", height=250)
-    tone = st.selectbox("🎯 Summary Style", ["Formal", "Neutral", "Casual", "Bullet Points"])
+    uploaded_file = st.file_uploader(
+        "📎 Upload a file (.txt, .pdf, .docx)",
+        type=["txt", "pdf", "docx"],
+        key="summary_upload"
+    )
 
-    if st.button("✨ Generate Summary"):
-        if text.strip():
-            with st.spinner("Generating summary..."):
-                summary = generate_summary(text, tone)
-            st.success("✅ Summary Ready!")
-            st.text_area("📘 Summary", summary, height=250)
+    # Extract text from uploaded file
+    default_text = ""
+    if uploaded_file:
+        with st.spinner("📖 Extracting text..."):
+            default_text = extract_uploaded_text(uploaded_file)
+
+    # Input text area
+    text_input = st.text_area(
+        "📝 Paste long text or report",
+        value=default_text,
+        height=250,
+        key="summary_text"
+    )
+
+    # Summary length options
+    length = st.selectbox(
+        "🧠 Choose summary length",
+        ["Very short (1–2 lines)", "Short (3–5 lines)", "Detailed paragraph"],
+        key="summary_length"
+    )
+
+    # Summarize button
+    if st.button("✨ Summarize Document", key="summarize_doc"):
+        if text_input.strip():
+            with st.spinner("🤖 Generating AI summary..."):
+                summary = openai_summarize_text(text_input, length)
+            st.success("✅ Summary generated successfully!")
+            st.text_area("🧾 Summary Output", summary, height=250)
+            get_text_download_link(summary, "summary.txt")
         else:
-            st.warning("Please enter text to summarize.")
+            st.warning("⚠️ Please provide text to summarize.")
