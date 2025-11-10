@@ -52,8 +52,8 @@ def get_text_download_link(text, filename):
 
 # --- Streamlit UI ---
 def show_summary_tab():
-    st.subheader("📄 Document Summarization (AI-Powered)")
-    st.markdown("Upload a document or paste text to generate a concise summary using OpenAI API.")
+    st.subheader("📄 Document Summarization")
+    st.markdown("Upload a document or paste text to generate a concise summary.")
 
     uploaded_file = st.file_uploader(
         "📎 Upload a file (.txt, .pdf, .docx)",
@@ -92,3 +92,4 @@ def show_summary_tab():
             get_text_download_link(summary, "summary.txt")
         else:
             st.warning("⚠️ Please provide text to summarize.")
+
