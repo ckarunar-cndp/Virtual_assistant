@@ -76,25 +76,19 @@ def show_edit_tab():
     # Final text to process
     final_text = raw_text.strip()
 
-    if st.button("✨ Improve Text", key="editor_run"):
+    if st.button("✨ Enhance Text", key="editor_run"):
         if not final_text:
             st.warning("⚠️ Please upload a file or paste text to edit.")
             return
 
         with st.spinner("✍️ Enhancing your text..."):
-            improved = edit_with_ai(final_text, goal)  # ← You plug your AI function here
+            improved = editorial_support(final_text, goal)  
 
         st.success("✅ Text improved!")
-        st.text_area("📄 Edited Output", improved, height=300)
+        st.text_area("📄 Refined Output", improved, height=300)
 
 
-    if st.button("✨ Enhance Text"):
-        if raw_text.strip():
-            with st.spinner("Improving text..."):
-                improved = editorial_support(raw_text, goal)
-            st.success("✅ Enhanced Text Ready!")
-            st.text_area("📘 Refined Output", improved, height=300)
-        else:
-            st.warning("⚠️ Please provide text for editing.")
+   
+
 
 
